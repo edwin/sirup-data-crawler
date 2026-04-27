@@ -3,6 +3,8 @@ package com.edw.mapper;
 import com.edw.model.TblKlpd;
 import com.edw.model.TblSatker;
 
+import java.util.List;
+
 /**
  * <pre>
  *  com.edw.mapper.TblSatkerMapper
@@ -20,5 +22,5 @@ public interface TblSatkerMapper {
 
     int updateSatker(TblSatker tblSatker);
 
-
+    List<String> getAllSatkerId();
 }

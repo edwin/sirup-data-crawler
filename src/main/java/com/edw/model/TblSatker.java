@@ -8,7 +8,6 @@ package com.edw.model;
  * @author Muhammad Edwin < edwin at redhat dot com >
  * 27 Apr 2026 15:45
  */
-
 public class TblSatker {
 
     private String idSatker;

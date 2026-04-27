@@ -22,4 +22,11 @@
         WHERE id_satker = #{idSatker}
     </update>
 
+    <select id="getAllSatkerId" resultType="String">
+        SELECT id_satker
+        FROM tbl_satker
+        ORDER BY id_satker
+    </select>
+
+
 </mapper>

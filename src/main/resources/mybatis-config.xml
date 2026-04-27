@@ -24,5 +24,6 @@
     <mappers>
         <mapper resource="mapper/TblKlpdMapper.xml" />
         <mapper resource="mapper/TblSatkerMapper.xml" />
+        <mapper resource="mapper/TblRupMapper.xml" />
     </mappers>
 </configuration>

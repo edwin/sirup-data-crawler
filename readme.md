@@ -4,10 +4,11 @@ A Java-based data crawler for extracting government institution and work unit da
 
 ## Overview
 
-This application crawls data from the Indonesian government procurement planning system (SIRUP) at `sirup.inaproc.id` and stores it in a MySQL database. It extracts two main types of data:
+This application crawls data from the Indonesian government procurement planning system (SIRUP) at `sirup.inaproc.id` and stores it in a MySQL database. It extracts three main types of data:
 
 1. **KLPD (Klasifikasi Lembaga Pemerintah Daerah)** - Government institution classifications
 2. **SATKER (Satuan Kerja)** - Work units under each government institution
+3. **RUP (Rencana Umum Pengadaan)** - Procurement planning records with budget information
 
 ## Features
 
@@ -66,6 +67,17 @@ CREATE TABLE `tbl_satker` (
       `created_at` timestamp NULL DEFAULT NULL,
       PRIMARY KEY (`id_satker`)
 );
+
+-- RUP Table
+CREATE TABLE `tbl_rup` (
+      `id_rup` varchar(20) NOT NULL,
+      `nama_rup` varchar(255) DEFAULT NULL,
+      `pagu_rup` decimal(15,2) DEFAULT NULL,
+      `tahun_rup` varchar(4) DEFAULT NULL,
+      `id_satker` varchar(10) DEFAULT NULL,
+      `created_at` timestamp NULL DEFAULT NULL,
+      PRIMARY KEY (`id_rup`)
+);
 ```
 
 ### 3. Configure Database Connection
@@ -86,7 +98,7 @@ mvn clean compile
 
 ### Running the Application
 
-The application can be run in two modes:
+The application can be run in three modes:
 
 #### 1. KLPD Data Crawling
 Uncomment the KLPD generation line in `Main.java`:
@@ -103,6 +115,15 @@ Keep the SATKER generation line active (default):
 public static void main(String[] args) {
     Main main = new Main();
     main.runGenerateTblSatker(); 
+}
+```
+
+#### 3. RUP Data Crawling
+Uncomment the RUP generation line in `Main.java`:
+```java
+public static void main(String[] args) {
+    Main main = new Main();
+    main.runGenerateTblRup(); 
 }
 ```
 
@@ -131,13 +152,16 @@ sirup-data-crawler/
 │   │   │   ├── Main.java                    # Main application entry point
 │   │   │   ├── mapper/
 │   │   │   │   ├── TblKlpdMapper.java       # KLPD database operations interface
+│   │   │   │   ├── TblRupMapper.java        # RUP database operations interface
 │   │   │   │   └── TblSatkerMapper.java     # SATKER database operations interface
 │   │   │   └── model/
 │   │   │       ├── TblKlpd.java             # KLPD data model
+│   │   │       ├── TblRup.java              # RUP data model
 │   │   │       └── TblSatker.java           # SATKER data model
 │   │   └── resources/
 │   │       ├── mapper/
 │   │       │   ├── TblKlpdMapper.xml        # KLPD SQL mappings
+│   │       │   ├── TblRupMapper.xml         # RUP SQL mappings
 │   │       │   └── TblSatkerMapper.xml      # SATKER SQL mappings
 │   │       ├── mybatis-config.xml           # MyBatis configuration
 │   │       └── log4j2.xml                   # Logging configuration
@@ -168,6 +192,7 @@ Logging is configured in `src/main/resources/log4j2.xml`. The application logs:
 The application uses these SIRUP API endpoints:
 - **KLPD Data**: `https://sirup.inaproc.id/sirup/datatablectr/datatablerupkldi2`
 - **SATKER Data**: `https://sirup.inaproc.id/sirup/datatablectr/datatableruprekapkldi`
+- **RUP Data**: `https://sirup.inaproc.id/sirup/datatablectr/dataruppenyediasatker`
 
 ### Data Processing
 - **Year**: Currently set to "2026" (can be modified in the code)
@@ -185,6 +210,12 @@ The application uses these SIRUP API endpoints:
    - Retrieves all KLPD IDs from the database
    - For each KLPD, fetches associated work units (SATKER)
    - Stores SATKER records with ID, name, and parent KLPD reference
+
+3. **RUP Crawling**:
+   - Retrieves all SATKER IDs from the database
+   - For each SATKER, fetches associated procurement planning records (RUP)
+   - Stores RUP records with ID, name, budget amount (pagu), year, and parent SATKER reference
+   - Uses upsert logic (insert new, update existing)
 
 ## Error Handling
 

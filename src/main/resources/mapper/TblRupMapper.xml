@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edw.mapper.TblRupMapper">
+
+    <select id="getRupById" parameterType="String" resultType="com.edw.model.TblRup">
+        SELECT id_rup, nama_rup, pagu_rup, tahun_rup, id_satker
+        FROM tbl_rup
+        WHERE id_rup = #{idRup}
+    </select>
+
+    <insert id="insertRup" parameterType="com.edw.model.TblRup">
+        INSERT INTO tbl_rup (id_rup, nama_rup, pagu_rup, tahun_rup, id_satker, created_at)
+        VALUES (#{idRup}, #{namaRup}, #{paguRup}, #{tahunRup}, #{idSatker}, NOW())
+    </insert>
+
+    <update id="updateRup" parameterType="com.edw.model.TblRup">
+        UPDATE tbl_rup
+        SET nama_rup = #{namaRup}, pagu_rup = #{paguRup}, tahun_rup = #{tahunRup}, id_satker = #{idSatker}, created_at = NOW()
+        WHERE id_rup = #{idRup}
+    </update>
+</mapper>
