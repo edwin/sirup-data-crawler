@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edw.mapper.TblSatkerMapper">
+
+    <select id="getSatkerById" parameterType="String" resultType="com.edw.model.TblSatker">
+        SELECT id_satker, nama_satker, id_klpd
+        FROM tbl_satker
+        WHERE id_satker = #{idSatker}
+    </select>
+
+    <insert id="insertSatker" parameterType="com.edw.model.TblSatker">
+        INSERT INTO tbl_satker (id_satker, nama_satker, id_klpd, created_at)
+        VALUES (#{idSatker}, #{namaSatker}, #{idKlpd}, NOW())
+    </insert>
+
+    <update id="updateSatker" parameterType="com.edw.model.TblSatker">
+        UPDATE tbl_satker
+        SET nama_satker = #{namaSatker}, id_klpd = #{idKlpd}, created_at = NOW()
+        WHERE id_satker = #{idSatker}
+    </update>
+
+</mapper>

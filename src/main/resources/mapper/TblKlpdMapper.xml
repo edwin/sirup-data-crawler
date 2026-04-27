@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.edw.mapper.TblKlpdMapper">
+
+    <select id="getKlpdById" parameterType="String" resultType="com.edw.model.TblKlpd">
+        SELECT id_klpd, nama_klpd, jenis_klpd
+        FROM tbl_klpd
+        WHERE id_klpd = #{idKlpd}
+    </select>
+
+    <insert id="insertKlpd" parameterType="com.edw.model.TblKlpd">
+        INSERT INTO tbl_klpd (id_klpd, nama_klpd, jenis_klpd, created_at)
+        VALUES (#{idKlpd}, #{namaKlpd}, #{jenisKlpd}, NOW())
+    </insert>
+
+    <update id="updateKlpd" parameterType="com.edw.model.TblKlpd">
+        UPDATE tbl_klpd
+        SET nama_klpd = #{namaKlpd}, jenis_klpd = #{jenisKlpd}, created_at = NOW()
+        WHERE id_klpd = #{idKlpd}
+    </update>
+
+    <select id="getAllKlpdIds" resultType="String">
+        SELECT id_klpd
+        FROM tbl_klpd
+        ORDER BY id_klpd
+    </select>
+
+</mapper>
