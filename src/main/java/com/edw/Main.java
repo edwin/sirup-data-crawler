@@ -9,6 +9,7 @@ import com.edw.mapper.TblSatkerMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.ibatis.io.Resources;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -25,6 +26,10 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <pre>
@@ -265,24 +270,42 @@ public class Main {
         try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
+            ExecutorService executor = Executors.newFixedThreadPool(12);
+
             try (SqlSession session = sqlSessionFactory.openSession()) {
                 TblSatkerMapper tblSatkerMapper = session.getMapper(TblSatkerMapper.class);
 
                 List<String> idSatkers = tblSatkerMapper.getAllSatkerId();
                 logger.info("Found {} Satkers records to process for RUP generation", idSatkers.size());
 
-                idSatkers.parallelStream().forEach(idSatker -> {
-                    try {
-                        generateTblRup("2026", idSatker, 0, 25_000);
-                    } catch (Exception e) {
-                        logger.error("Error processing RUP for Satker: {}", idSatker, e);
-                    }
-                });
+                List<Future<?>> futures = new ArrayList<>();
 
+                for (String idSatker : idSatkers) {
+                    futures.add(executor.submit(() -> {
+                        try {
+                            generateTblRup("2026", idSatker, 0, 25_000);
+                        } catch (Exception e) {
+                            logger.error("Error processing RUP for Satker: {}", idSatker, e);
+                        }
+                    }));
+                }
+
+                for (Future<?> f : futures) {
+                    f.get();
+                }
             } catch (Exception e) {
                 logger.error("Error processing Satker generation", e);
-            }
+            } finally {
+                executor.shutdown();
 
+                try {
+                    if (!executor.awaitTermination(10, TimeUnit.MINUTES)) {
+                        executor.shutdownNow();
+                    }
+                } catch (InterruptedException e) {
+                    executor.shutdownNow();
+                }
+            }
         } catch (IOException e) {
             logger.error("Error loading MyBatis configuration for Satker generation", e);
         }
@@ -305,11 +328,8 @@ public class Main {
         try (InputStream inputStream = Resources.getResourceAsStream(resource)) {
             SqlSessionFactory sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
 
-            try (SqlSession session = sqlSessionFactory.openSession()) {
+            try (SqlSession session = sqlSessionFactory.openSession(ExecutorType.BATCH, false)) {
                 TblRupMapper mapper = session.getMapper(TblRupMapper.class);
-
-                // set as autocommit
-                session.getConnection().setAutoCommit(true);
 
                 HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 
@@ -322,6 +342,8 @@ public class Main {
                         logger.info("Successfully processed {} RUP records for Satker : {}", rupList.size(), idSatker);
                     }
 
+                    session.commit();
+                    Thread.sleep(50);
                 } else {
                     logger.error("HTTP request failed with status code: {} for Satker: {}", response.statusCode(), idSatker);
                 }
