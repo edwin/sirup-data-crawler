@@ -14,6 +14,7 @@ This application crawls data from the Indonesian government procurement planning
 
 - **Automated Data Crawling**: Fetches data from SIRUP API endpoints
 - **Database Integration**: Stores data in MySQL using MyBatis ORM
+- **Batch Insert Operations**: High-performance batch inserts for SATKER data to improve processing speed
 - **Upsert Operations**: Automatically inserts new records or updates existing ones
 - **Multi-Institution Support**: Handles different types of government institutions:
   - KEMENTERIAN (Ministries)
@@ -62,7 +63,7 @@ CREATE TABLE `tbl_klpd` (
 -- SATKER Table
 CREATE TABLE `tbl_satker` (
       `id_satker` varchar(10) NOT NULL,
-      `nama_satker` varchar(150) DEFAULT NULL,
+      `nama_satker` varchar(250) DEFAULT NULL,
       `id_klpd` varchar(5) DEFAULT NULL,
       `created_at` timestamp NULL DEFAULT NULL,
       PRIMARY KEY (`id_satker`)
@@ -209,6 +210,7 @@ The application uses these SIRUP API endpoints:
 2. **SATKER Crawling**:
    - Retrieves all KLPD IDs from the database
    - For each KLPD, fetches associated work units (SATKER)
+   - Uses batch insert operations to efficiently store multiple SATKER records in a single database transaction
    - Stores SATKER records with ID, name, and parent KLPD reference
 
 3. **RUP Crawling**:

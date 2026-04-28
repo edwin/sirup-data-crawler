@@ -23,4 +23,6 @@ public interface TblSatkerMapper {
     int updateSatker(TblSatker tblSatker);
 
     List<String> getAllSatkerId();
+
+    void insertSatkerList(List<TblSatker> list);
 }

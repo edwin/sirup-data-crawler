@@ -28,5 +28,14 @@
         ORDER BY id_satker
     </select>
 
+    <insert id="insertSatkerList">
+        INSERT INTO tbl_satker (id_satker, nama_satker, id_klpd, created_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.idSatker}, #{item.namaSatker}, #{item.idKlpd}, NOW())
+        </foreach>
+
+    </insert>
+
 
 </mapper>

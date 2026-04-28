@@ -48,8 +48,8 @@ public class Main {
 
     public static void main(String[] args) {
         Main main = new Main();
-//        main.runGenerateTblKlpd();
-//        main.runGenerateTblSatker();
+        main.runGenerateTblKlpd();
+        main.runGenerateTblSatker();
         main.runGenerateTblRup();
     }
 
@@ -163,7 +163,7 @@ public class Main {
                 logger.info("Found {} KLPD records to process for Satker generation", klpdIds.size());
 
                 for (String idKlpd : klpdIds) {
-                    generateTblSatker("2026", idKlpd, 0, 1_000);
+                    generateTblSatker("2026", idKlpd, 0, 2_000);
                 }
 
             } catch (Exception e) {
@@ -204,23 +204,11 @@ public class Main {
                     String jsonResponse = response.body();
                     List<TblSatker> satkerList = parseJsonToTblSatker(jsonResponse, idKlpd);
 
-                    for (TblSatker satker : satkerList) {
-                        try {
-                            TblSatker existing = mapper.getSatkerById(satker.getIdSatker());
-
-                            if (existing != null) {
-                                mapper.updateSatker(satker);
-                                logger.info("Updated Satker: {} - {} - KLPD: {}", satker.getIdSatker(), satker.getNamaSatker(), satker.getIdKlpd());
-                            } else {
-                                mapper.insertSatker(satker);
-                                logger.info("Inserted Satker: {} - {} - KLPD: {}", satker.getIdSatker(), satker.getNamaSatker(), satker.getIdKlpd());
-                            }
-                        } catch (Exception e) {
-                            logger.error("Error processing Satker: {} - {} - KLPD: {}", satker.getIdSatker(), satker.getNamaSatker(), satker.getIdKlpd(), e);
-                        }
+                    if (!satkerList.isEmpty()) {
+                        mapper.insertSatkerList(satkerList);
+                        logger.info("Successfully processed {} Satker records for KLPD: {}", satkerList.size(), idKlpd);
                     }
 
-                    logger.info("Successfully processed {} Satker records for KLPD: {}", satkerList.size(), idKlpd);
                 } else {
                     logger.error("HTTP request failed with status code: {} for KLPD: {}", response.statusCode(), idKlpd);
                 }
@@ -279,7 +267,7 @@ public class Main {
                 logger.info("Found {} Satkers records to process for RUP generation", idSatkers.size());
 
                 for (String idSatker : idSatkers) {
-                    generateTblRup("2026", idSatker, 0, 10_000);
+                    generateTblRup("2026", idSatker, 0, 15_000);
                 }
 
             } catch (Exception e) {
