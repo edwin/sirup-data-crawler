@@ -162,9 +162,14 @@ public class Main {
                 List<String> klpdIds = klpdMapper.getAllKlpdIds();
                 logger.info("Found {} KLPD records to process for Satker generation", klpdIds.size());
 
-                for (String idKlpd : klpdIds) {
-                    generateTblSatker("2026", idKlpd, 0, 2_000);
-                }
+
+                klpdIds.parallelStream().forEach (idKlpd -> {
+                    try {
+                        generateTblSatker("2026", idKlpd, 0, 2_000);
+                    } catch (Exception e) {
+                        logger.error("Error processing Satker for Klpd: {}", idKlpd, e);
+                    }
+                });
 
             } catch (Exception e) {
                 logger.error("Error processing Satker generation", e);
@@ -266,9 +271,13 @@ public class Main {
                 List<String> idSatkers = tblSatkerMapper.getAllSatkerId();
                 logger.info("Found {} Satkers records to process for RUP generation", idSatkers.size());
 
-                for (String idSatker : idSatkers) {
-                    generateTblRup("2026", idSatker, 0, 25_000);
-                }
+                idSatkers.parallelStream().forEach(idSatker -> {
+                    try {
+                        generateTblRup("2026", idSatker, 0, 25_000);
+                    } catch (Exception e) {
+                        logger.error("Error processing RUP for Satker: {}", idSatker, e);
+                    }
+                });
 
             } catch (Exception e) {
                 logger.error("Error processing Satker generation", e);
