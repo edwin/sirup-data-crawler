@@ -2,6 +2,8 @@ package com.edw.mapper;
 
 import com.edw.model.TblRup;
 
+import java.util.List;
+
 /**
  * <pre>
  *  com.edw.mapper.TblRupMapper
@@ -17,5 +19,7 @@ public interface TblRupMapper {
     int insertRup(TblRup tblRup);
 
     int updateRup(TblRup tblRup);
+
+    void insertRupList(List<TblRup> list);
 
 }

@@ -267,7 +267,7 @@ public class Main {
                 logger.info("Found {} Satkers records to process for RUP generation", idSatkers.size());
 
                 for (String idSatker : idSatkers) {
-                    generateTblRup("2026", idSatker, 0, 15_000);
+                    generateTblRup("2026", idSatker, 0, 25_000);
                 }
 
             } catch (Exception e) {
@@ -308,23 +308,11 @@ public class Main {
                     String jsonResponse = response.body();
                     List<TblRup> rupList = parseJsonToTblRup(jsonResponse, idSatker, tahun);
 
-                    for (TblRup tblRup : rupList) {
-                        try {
-                            TblRup existing = mapper.getRupById(tblRup.getIdSatker());
-
-                            if (existing != null) {
-                                mapper.updateRup(tblRup);
-                                logger.info("Updated Rup: {} - {} - Satker: {}", tblRup.getIdSatker(), tblRup.getNamaRup(), tblRup.getIdSatker());
-                            } else {
-                                mapper.insertRup(tblRup);
-                                logger.info("Inserted Rup: {} - {} - Satker: {}", tblRup.getIdSatker(), tblRup.getNamaRup(), tblRup.getIdSatker());
-                            }
-                        } catch (Exception e) {
-                            logger.error("Error processing RUP: {} - {} - Satker: {}", tblRup.getIdSatker(), tblRup.getNamaRup(), tblRup.getIdSatker(), e);
-                        }
+                    if(!rupList.isEmpty()) {
+                        mapper.insertRupList(rupList);
+                        logger.info("Successfully processed {} RUP records for Satker : {}", rupList.size(), idSatker);
                     }
 
-                    logger.info("Successfully processed {} RUP records for Satker : {}", rupList.size(), idSatker);
                 } else {
                     logger.error("HTTP request failed with status code: {} for Satker: {}", response.statusCode(), idSatker);
                 }

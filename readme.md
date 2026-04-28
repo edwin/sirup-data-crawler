@@ -72,7 +72,7 @@ CREATE TABLE `tbl_satker` (
 -- RUP Table
 CREATE TABLE `tbl_rup` (
       `id_rup` varchar(20) NOT NULL,
-      `nama_rup` varchar(255) DEFAULT NULL,
+      `nama_rup` text DEFAULT NULL,
       `pagu_rup` decimal(15,2) DEFAULT NULL,
       `tahun_rup` varchar(4) DEFAULT NULL,
       `id_satker` varchar(10) DEFAULT NULL,
@@ -217,7 +217,7 @@ The application uses these SIRUP API endpoints:
    - Retrieves all SATKER IDs from the database
    - For each SATKER, fetches associated procurement planning records (RUP)
    - Stores RUP records with ID, name, budget amount (pagu), year, and parent SATKER reference
-   - Uses upsert logic (insert new, update existing)
+   - Uses batch insert operations
 
 ## Error Handling
 

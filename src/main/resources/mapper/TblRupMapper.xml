@@ -21,4 +21,15 @@
         SET nama_rup = #{namaRup}, pagu_rup = #{paguRup}, tahun_rup = #{tahunRup}, id_satker = #{idSatker}, created_at = NOW()
         WHERE id_rup = #{idRup}
     </update>
+
+
+    <insert id="insertRupList">
+        INSERT INTO tbl_rup (id_rup, nama_rup, pagu_rup, tahun_rup, id_satker, created_at)
+        VALUES
+        <foreach collection="list" item="item" separator=",">
+            (#{item.idRup}, #{item.namaRup}, #{item.paguRup}, #{item.tahunRup}, #{item.idSatker}, NOW())
+        </foreach>
+
+    </insert>
+
 </mapper>
